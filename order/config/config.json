@@ -1,0 +1,9 @@
+{
+  "PSQL": {
+    "host": "localhost",
+    "port": "5432",
+    "name": "default",
+    "user": "default",
+    "password": "secret"
+  }
+}

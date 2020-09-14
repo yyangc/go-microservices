@@ -2,6 +2,12 @@ package main
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
+
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/yyangc/go-microservices/order/protos/order"
@@ -9,11 +15,6 @@ import (
 	"github.com/yyangc/go-microservices/user-api/data"
 	"github.com/yyangc/go-microservices/user-api/handlers"
 	"google.golang.org/grpc"
-	"io"
-	"net/http"
-	"os"
-	"os/signal"
-	"time"
 )
 
 func main() {
@@ -42,8 +43,9 @@ func main() {
 	getR.HandleFunc("/user/info/{id:[0-9]+}", u.UserInfo)
 	getR.HandleFunc("/user/order-list/{id:[0-9]+}", u.UserOrderList)
 
-	//postR := r.Methods(http.MethodPost).Subrouter()
-	//postR.HandleFunc("/user", u.CreateUser)
+	postR := r.Methods(http.MethodPost).Subrouter()
+	postR.HandleFunc("/user", u.CreateUser)
+	postR.HandleFunc("/login", u.Login)
 
 	//putR := r.Methods(http.MethodPut).Subrouter()
 	//putR.HandleFunc("/user/info/{id:[0-9]+}", u.UpdateUser)
@@ -55,8 +57,8 @@ func main() {
 		Addr:         ":" + config.Env.Port,
 		Handler:      r,
 		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	go func() {

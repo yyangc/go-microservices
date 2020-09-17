@@ -11,6 +11,8 @@ require (
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	google.golang.org/grpc v1.32.0
 	google.golang.org/protobuf v1.25.0 // indirect
+	gorm.io/driver/mysql v1.0.1
+	gorm.io/gorm v1.20.1
 )
 
 replace github.com/yyangc/go-microservices/order => ../order

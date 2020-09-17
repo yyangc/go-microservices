@@ -10,4 +10,6 @@ require (
 	github.com/spf13/viper v1.7.1
 	google.golang.org/grpc v1.32.0
 	google.golang.org/protobuf v1.25.0
+	gorm.io/driver/postgres v1.0.0
+	gorm.io/gorm v1.20.1
 )

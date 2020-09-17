@@ -14,8 +14,8 @@ message OrdersResponse {
     int64 order_id = 2;
     double price = 3;
     int32  status = 4;
-    string  create_dt = 5;
-    string  update_dt = 6;
+    string  created_dt = 5;
+    string  updated_dt = 6;
   }
   repeated Order orders = 1;
 }

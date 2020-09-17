@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"database/sql"
-	"errors"
 	pb "github.com/yyangc/go-microservices/order/protos/order"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -12,50 +11,32 @@ import (
 var SexList = []uint8{0, 1, 2}
 
 type User struct {
-	ID       uint64         `json:"id"`
-	UserName string         `json:"username"`
-	Password string			`json:"-"`
-	Status   uint8          `json:"status"`
-	Sex      uint8          `json:"sex"`
-	Mail     string         `json:"mail"`
-	CreateDt sql.NullString `json:"-"`
-	UpdateDt sql.NullString `json:"-"`
+	ID        uint64         `gorm:"column:id" json:"id"`
+	UserName  string         `gorm:"column:username" json:"username"`
+	Password  string         `gorm:"column:password" json:"-"`
+	Status    uint8          `gorm:"column:status;default:1" json:"status"`
+	Sex       uint8          `gorm:"column:sex;default:0" json:"sex"`
+	Mail      string         `gorm:"column:mail" json:"mail"`
+	CreatedDt time.Time      `gorm:"column:created_dt;default:null" json:"-"`
+	UpdatedDt sql.NullString `gorm:"column:updated_dt;default:null" json:"-"`
 }
 
 func (u *UserDB) GetUserInfo(id int64) (*User, error) {
 	user := new(User)
-	err := u.db.QueryRow("SELECT * FROM user WHERE id = ?", id).Scan(
-		&user.ID,
-		&user.UserName,
-		&user.Password,
-		&user.Status,
-		&user.Sex,
-		&user.Mail,
-		&user.CreateDt,
-		&user.UpdateDt,
-	)
+	res := u.db.First(&user, id)
 
-	if err != nil {
-		return nil, err
+	if res.Error != nil {
+		return nil, res.Error
 	}
 	return user, nil
 }
 
 func (u *UserDB) GetUserByUserName(s string) (*User, error) {
 	user := new(User)
-	err := u.db.QueryRow("SELECT * FROM user WHERE username = ?", s).Scan(
-		&user.ID,
-		&user.UserName,
-		&user.Password,
-		&user.Status,
-		&user.Sex,
-		&user.Mail,
-		&user.CreateDt,
-		&user.UpdateDt,
-	)
+	res := u.db.Where("username = ?", s).First(&user)
 
-	if err != nil {
-		return nil, err
+	if res.Error != nil {
+		return nil, res.Error
 	}
 	return user, nil
 }
@@ -71,35 +52,17 @@ func (u *UserDB) GetUserOrderList(id int64) (*pb.OrdersResponse, error) {
 	return list, err
 }
 
-func (u *UserDB) CreateUser(us *User) (int64, error) {
-	if us.UserName == "" || len(us.UserName) > 20 {
-		return 0, errors.New("invalid username")
-	}
-	if us.Password == "" || len(us.Password) < 8 {
-		return 0, errors.New("invalid password")
-	}
-	if isSex := checkSex(&us.Sex); isSex != true{
-		return 0, errors.New("invalid Sex")
-	}
-	if isEmail := isEmailValid(&us.Mail); isEmail != true {
-		return 0, errors.New("invalid Mail")
-	}
+func (u *UserDB) CreateUser(us *User) (uint64, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(us.Password), 14)
 	if err != nil {
 		return 0, err
 	}
 	us.Password = string(bytes)
-	result, error := u.db.Exec("INSERT INTO user (username, password, sex, mail, create_dt) VALUES (?, ?, ?, ?, ?)",
-		us.UserName,
-		us.Password,
-		us.Sex,
-		us.Mail,
-		time.Now().Format("2006-01-02 15:04:05"),
-		)
-	if error != nil {
-		u.l.Error(error)
-		return 0, error
+	res := u.db.Create(&us)
+	if res.Error != nil {
+		u.l.Error(res.Error)
+		return 0, res.Error
 	}
-	id, _ := result.LastInsertId()
+	id := us.ID
 	return id, nil
 }

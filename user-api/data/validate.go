@@ -1,21 +1,37 @@
 package data
 
-import "regexp"
+import (
+	"regexp"
+)
 
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-func checkSex(s *uint8) bool {
+func (u *User) CheckSex() bool {
 	for _, v := range SexList {
-		if *s == v {
+		if u.Sex == v {
 			return true
 		}
 	}
 	return false
 }
 
-func isEmailValid(e *string) bool {
-	if len(*e) < 3 && len(*e) > 254 {
+func (u *User) CheckMail() bool {
+	if len(u.Mail) < 3 && len(u.Mail) > 254 {
 		return false
 	}
-	return emailRegex.MatchString(*e)
+	return emailRegex.MatchString(u.Mail)
+}
+
+func (u *User) CheckUserName() bool {
+	if u.UserName == "" || len(u.UserName) < 6 || len(u.UserName) > 30 {
+		return false
+	}
+	return true
+}
+
+func (u *User) CheckPassword() bool {
+	if u.Password == "" || len(u.Password) < 8 {
+		return false
+	}
+	return true
 }

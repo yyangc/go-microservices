@@ -4,6 +4,54 @@ import (
 	"testing"
 )
 
+func TestGetUserId(t *testing.T) {
+	cases := []struct {
+		id   string
+		name string
+		want uint64
+	}{
+		{
+			id:   "1",
+			name: "id_1",
+			want: 1,
+		},
+		{
+			id:   "123",
+			name: "id_123",
+			want: 123,
+		},
+		{
+			id:   "01",
+			name: "id_01",
+			want: 1,
+		},
+		{
+			id:   "0",
+			name: "id_0",
+			want: 0,
+		},
+		{
+			id:   "abc",
+			name: "id_abc",
+			want: 0,
+		},
+		{
+			id:   "",
+			name: "id_''",
+			want: 0,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, _ := GetUserId(tc.id)
+			if got != tc.want {
+				t.Errorf("Want '%v', got '%v'", tc.want, got)
+			}
+		})
+	}
+}
+
 func TestCheckSex(t *testing.T) {
 	cases := []struct {
 		user User

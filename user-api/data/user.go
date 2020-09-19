@@ -52,17 +52,24 @@ func (u *UserDB) GetUserOrderList(id int64) (*pb.OrdersResponse, error) {
 	return list, err
 }
 
-func (u *UserDB) CreateUser(us *User) (uint64, error) {
+func (u *UserDB) CreateUser(us *User) error {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(us.Password), 14)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	us.Password = string(bytes)
 	res := u.db.Create(&us)
 	if res.Error != nil {
 		u.l.Error(res.Error)
-		return 0, res.Error
+		return res.Error
 	}
-	id := us.ID
-	return id, nil
+	return nil
+}
+
+func (u *UserDB) UpdateInfo(us *User) error {
+	res := u.db.Model(us).Select("sex", "mail").Updates(*us)
+	if res.Error != nil {
+		return res.Error
+	}
+	return nil
 }

@@ -48,14 +48,14 @@ func (u *User) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create user
-	id, err := u.db.CreateUser(newUser)
+	err = u.db.CreateUser(newUser)
 	if err != nil {
 		ResERROR(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	info := map[string]uint64{
-		"id": id,
+		"id": newUser.ID,
 	}
 	ResJSON(w, http.StatusOK, &Response{Data: info})
 }

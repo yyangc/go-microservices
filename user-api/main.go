@@ -47,8 +47,8 @@ func main() {
 	postR.HandleFunc("/user", u.CreateUser)
 	postR.HandleFunc("/login", u.Login)
 
-	//putR := r.Methods(http.MethodPut).Subrouter()
-	//putR.HandleFunc("/user/info/{id:[0-9]+}", u.UpdateUser)
+	putR := r.Methods(http.MethodPut).Subrouter()
+	putR.HandleFunc("/user/info", u.UpdateInfo)
 
 	//deleteR := r.Methods(http.MethodDelete).Subrouter()
 	//deleteR.HandleFunc("/user/{id:[0-9]+}", u.DeleteUser)
@@ -84,11 +84,7 @@ func initLogger() *log.Logger {
 	l.SetFormatter(&log.JSONFormatter{})
 	l.SetLevel(log.InfoLevel)
 	l.SetReportCaller(true)
-	file, err := os.OpenFile("/Users/yang.c/go/src/github.com/yyangc/go-microservices/user-api/log/user.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		l.Println(err.Error())
-	}
-	mw := io.MultiWriter(os.Stdout, file)
+	mw := io.MultiWriter(os.Stdout)
 	l.SetOutput(mw)
 	return l
 }

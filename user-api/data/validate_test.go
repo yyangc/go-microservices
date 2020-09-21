@@ -4,86 +4,38 @@ import (
 	"testing"
 )
 
-func TestGetUserId(t *testing.T) {
-	cases := []struct {
-		id   string
-		name string
-		want uint64
-	}{
-		{
-			id:   "1",
-			name: "id_1",
-			want: 1,
-		},
-		{
-			id:   "123",
-			name: "id_123",
-			want: 123,
-		},
-		{
-			id:   "01",
-			name: "id_01",
-			want: 1,
-		},
-		{
-			id:   "0",
-			name: "id_0",
-			want: 0,
-		},
-		{
-			id:   "abc",
-			name: "id_abc",
-			want: 0,
-		},
-		{
-			id:   "",
-			name: "id_''",
-			want: 0,
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			got, _ := GetUserId(tc.id)
-			if got != tc.want {
-				t.Errorf("Want '%v', got '%v'", tc.want, got)
-			}
-		})
-	}
-}
-
 func TestCheckSex(t *testing.T) {
 	cases := []struct {
 		user User
 		name string
-		want bool
+		want error
 	}{
 		{
 			user: User{
 				Sex: 0,
 			},
-			want: true,
+			want: nil,
 			name: "sex_0",
 		},
 		{
 			user: User{
 				Sex: 1,
 			},
-			want: true,
+			want: nil,
 			name: "sex_1",
 		},
 		{
 			user: User{
 				Sex: 2,
 			},
-			want: true,
+			want: nil,
 			name: "sex_2",
 		},
 		{
 			user: User{
 				Sex: 3,
 			},
-			want: false,
+			want: nil,
 			name: "sex_3",
 		},
 	}
@@ -91,9 +43,8 @@ func TestCheckSex(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.user.CheckSex()
-
 			if tc.want != got {
-				t.Errorf("Want '%t', got '%t'", tc.want, got)
+				t.Errorf("Want '%v', got '%v'", tc.want, got)
 			}
 		})
 	}
@@ -103,50 +54,60 @@ func TestCheckMail(t *testing.T) {
 	cases := []struct {
 		user User
 		name string
-		want bool
+		want interface{}
 	}{
 		{
 			user: User{
 				Mail: "abc@gmail.com",
 			},
 			name: "mail_abc@gmail.com",
-			want: true,
+			want: nil,
 		},
 		{
 			user: User{
 				Mail: "abc",
 			},
 			name: "mail_abc",
-			want: false,
+			want: "Mail Invalid",
 		},
 		{
 			user: User{
 				Mail: "abc@",
 			},
 			name: "mail_abc@",
-			want: false,
+			want: "Mail Invalid",
 		},
 		{
 			user: User{
 				Mail: "abc.gmail.com",
 			},
 			name: "mail_abc.gmail.com",
-			want: false,
+			want: "Mail Invalid",
 		},
 		{
 			user: User{
 				Mail: "_@_",
 			},
 			name: "mail_@",
-			want: false,
+			want: "Mail Invalid",
+		},
+		{
+			user: User{
+				Mail: "",
+			},
+			name: "mail_''",
+			want: "Empty Mail",
 		},
 	}
+
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := tc.user.CheckMail()
-
-			if tc.want != got {
-				t.Errorf("Want '%t', got '%t'", tc.want, got)
+			err := tc.user.CheckMail()
+			if err == nil && tc.want != err {
+				t.Errorf("Want '%v', got '%v'", tc.want, err)
+			}
+			if err != nil && tc.want != err.Error() {
+				t.Errorf("Want '%v', got '%v'", tc.want, err.Error())
 			}
 		})
 	}
@@ -156,57 +117,59 @@ func TestCheckUserName(t *testing.T) {
 	cases := []struct {
 		user User
 		name string
-		want bool
+		want interface{}
 	}{
 		{
 			user: User{
 				UserName: "chloeeee",
 			},
 			name: "n_chloeeee",
-			want: true,
+			want: nil,
 		},
 		{
 			user: User{
 				UserName: "CHLOEEEE",
 			},
 			name: "n_CHLOEEEE",
-			want: true,
+			want: nil,
 		},
 		{
 			user: User{
-				UserName: "12345!@678",
+				UserName: "12345_678",
 			},
-			name: "n_12345!@678",
-			want: true,
+			name: "n_12345_678",
+			want: ErrorUesrName,
 		},
 		{
 			user: User{
-				UserName: "!^abc$_123",
+				UserName: "Aabc-123",
 			},
-			name: "n_!^abc$_123",
-			want: true,
+			name: "n__Aabc-123",
+			want: ErrorUesrName,
 		},
 		{
 			user: User{
 				UserName: "_@_",
 			},
 			name: "n_@",
-			want: false,
+			want: ErrorUesrName,
 		},
 		{
 			user: User{
 				UserName: "12345",
 			},
 			name: "n_12345",
-			want: false,
+			want: ErrorUesrName,
 		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := tc.user.CheckUserName()
-
-			if tc.want != got {
-				t.Errorf("Want '%t', got '%t'", tc.want, got)
+			err := tc.user.CheckUserName()
+			if err == nil && tc.want != err {
+				t.Errorf("Want '%v', got '%v'", tc.want, err)
+			}
+			if err != nil && tc.want != err.Error() {
+				t.Errorf("Want '%v', got '%v'", tc.want, err.Error())
 			}
 		})
 	}
@@ -216,57 +179,113 @@ func TestCheckPassword(t *testing.T) {
 	cases := []struct {
 		user User
 		name string
-		want bool
+		want interface{}
 	}{
 		{
 			user: User{
-				Password: "chloeeee",
+				Password: "Chloe",
 			},
-			name: "p_chloeeee",
-			want: true,
+			name: "p_Chloe",
+			want: ErrorPassword["len"],
 		},
 		{
 			user: User{
-				Password: "CHLOE_!@><(12345678)-_-_-=",
+				Password: "CHLOe_!@><(12345678)-_-_-=",
 			},
-			name: "p_CHLOE_!@><(12345678)-_-_-=",
-			want: true,
+			name: "p_CHLOe_!@><(12345678)-_-_-=",
+			want: nil,
 		},
 		{
 			user: User{
 				Password: "12345!@678",
 			},
 			name: "p_12345!@678",
-			want: true,
+			want: ErrorPassword["lower"],
 		},
 		{
 			user: User{
 				Password: "!^abc$_123",
 			},
 			name: "p_!^abc$_123",
-			want: true,
+			want: ErrorPassword["upper"],
 		},
 		{
 			user: User{
 				Password: "_@_",
 			},
-			name: "p_@",
-			want: false,
+			name: "p_@_",
+			want: ErrorPassword["len"],
 		},
 		{
 			user: User{
-				Password: "12345",
+				Password: "12345Abc",
 			},
 			name: "p_12345",
-			want: false,
+			want: ErrorPassword["symbol"],
 		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := tc.user.CheckPassword()
+			err := tc.user.CheckPassword()
 
-			if tc.want != got {
-				t.Errorf("Want '%t', got '%t'", tc.want, got)
+			if err == nil && tc.want != err {
+				t.Errorf("Want '%v', got '%v'", tc.want, err)
+			}
+			if err != nil && tc.want != err.Error() {
+				t.Errorf("Want '%v', got '%v'", tc.want, err.Error())
+			}
+		})
+	}
+}
+
+func TestValidateCreate(t *testing.T) {
+	cases := []struct {
+		user User
+		name string
+		want interface{}
+	}{
+		{
+			user: User{
+				Password: "Chloe",
+				Sex:      0,
+			},
+			name: "p_Chloe",
+			want: ErrorPassword["len"],
+		},
+		{
+			user: User{
+				Password: "CHLOe_!@><(12345678)-_-_-=",
+				Sex:      1,
+			},
+			name: "p_CHLOe_!@><(12345678)-_-_-=",
+			want: nil,
+		},
+		{
+			user: User{
+				Password: "12345!@678",
+				Sex:      2,
+			},
+			name: "p_12345!@678",
+			want: ErrorPassword["lower"],
+		},
+		{
+			user: User{
+				Password: "!^Abc$_123",
+				Sex:      3,
+			},
+			name: "p_!^abc$_123",
+			want: nil,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.user.CheckPassword()
+
+			if err == nil && tc.want != err {
+				t.Errorf("Want '%v', got '%v'", tc.want, err)
+			}
+			if err != nil && tc.want != err.Error() {
+				t.Errorf("Want '%v', got '%v'", tc.want, err.Error())
 			}
 		})
 	}

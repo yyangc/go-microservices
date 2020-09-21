@@ -8,9 +8,9 @@ import (
 )
 
 func (u *User) UpdateInfo(w http.ResponseWriter, r *http.Request) {
-	id, err := data.GetUserId(r.FormValue("id"))
-	if err != nil {
-		ResERROR(w, http.StatusUnauthorized, err)
+	id, err := strconv.ParseUint(r.FormValue("id"), 10, 64)
+	if id == 0 || err != nil {
+		ResERROR(w, http.StatusUnauthorized, errors.New("invalid user id"))
 		return
 	}
 	sex, _ := strconv.ParseUint(r.FormValue("sex"), 10, 8)
@@ -20,12 +20,9 @@ func (u *User) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		Sex:      uint8(sex),
 		Mail:     r.FormValue("mail"),
 	}
-	if !user.CheckSex() {
-		ResERROR(w, http.StatusUnauthorized, errors.New("invalid Sex"))
-		return
-	}
-	if !user.CheckMail() {
-		ResERROR(w, http.StatusUnauthorized, errors.New("invalid Mail"))
+	err = user.Validate("update")
+	if err != nil {
+		ResERROR(w, http.StatusUnauthorized, err)
 		return
 	}
 	err = u.db.UpdateInfo(user)

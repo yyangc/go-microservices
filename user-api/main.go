@@ -50,9 +50,6 @@ func main() {
 	putR := r.Methods(http.MethodPut).Subrouter()
 	putR.HandleFunc("/user/info", u.UpdateInfo)
 
-	//deleteR := r.Methods(http.MethodDelete).Subrouter()
-	//deleteR.HandleFunc("/user/{id:[0-9]+}", u.DeleteUser)
-
 	srv := &http.Server{
 		Addr:         ":" + config.Env.Port,
 		Handler:      r,

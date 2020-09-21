@@ -10,7 +10,7 @@ func (u *User) UserInfo(w http.ResponseWriter, r *http.Request) {
 	id := getUserID(r)
 	user, err := u.db.GetUserInfo(id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		ResJSON(w, http.StatusNotFound, &Response{Message: "user not found"})
+		ResERROR(w, http.StatusNotFound, errors.New("user not found"))
 		return
 	}
 	if err != nil {

@@ -25,6 +25,7 @@ func (u *User) UserOrderList(w http.ResponseWriter, r *http.Request) {
 	list, err := u.db.GetUserOrderList(id)
 	if err != nil {
 		ResERROR(w, http.StatusInternalServerError, err)
+		return
 	}
 	ResJSON(w, http.StatusOK, &Response{Data: list})
 }

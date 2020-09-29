@@ -48,7 +48,7 @@ func main() {
 	postR.HandleFunc("/login", u.Login)
 
 	putR := r.Methods(http.MethodPut).Subrouter()
-	putR.HandleFunc("/user/info", u.UpdateInfo)
+	putR.HandleFunc("/user/info/{id:[0-9]+}", u.UpdateInfo)
 
 	srv := &http.Server{
 		Addr:         ":" + config.Env.Port,

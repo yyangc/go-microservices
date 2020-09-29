@@ -1,18 +1,13 @@
 package handlers
 
 import (
-	"errors"
 	"github.com/yyangc/go-microservices/user-api/data"
 	"net/http"
 	"strconv"
 )
 
 func (u *User) UpdateInfo(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(r.FormValue("id"), 10, 64)
-	if id == 0 || err != nil {
-		ResERROR(w, http.StatusUnauthorized, errors.New("invalid user id"))
-		return
-	}
+	id := getUserID(r)
 	sex, _ := strconv.ParseUint(r.FormValue("sex"), 10, 8)
 	user := &data.User{
 		ID:       id,
@@ -20,7 +15,7 @@ func (u *User) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		Sex:      uint8(sex),
 		Mail:     r.FormValue("mail"),
 	}
-	err = user.Validate("update")
+	err := user.Validate("update")
 	if err != nil {
 		ResERROR(w, http.StatusUnauthorized, err)
 		return

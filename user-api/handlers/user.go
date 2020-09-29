@@ -17,7 +17,7 @@ func NewUser(l *log.Logger, db *data.UserDB) *User {
 	return &User{l: l, db: db}
 }
 
-func getUserID(r *http.Request) int64 {
+func getUserID(r *http.Request) uint64 {
 	vars := mux.Vars(r)
 	id, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
@@ -25,5 +25,5 @@ func getUserID(r *http.Request) int64 {
 		panic(err)
 	}
 
-	return id
+	return uint64(id)
 }

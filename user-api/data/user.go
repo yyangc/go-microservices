@@ -21,7 +21,7 @@ type User struct {
 	UpdatedDt sql.NullString `gorm:"column:updated_dt;default:null" json:"-"`
 }
 
-func (u *UserDB) GetUserInfo(id int64) (*User, error) {
+func (u *UserDB) GetUserInfo(id uint64) (*User, error) {
 	user := new(User)
 	res := u.db.First(&user, id)
 
@@ -41,7 +41,7 @@ func (u *UserDB) GetUserByUserName(s string) (*User, error) {
 	return user, nil
 }
 
-func (u *UserDB) GetUserOrderList(id int64) (*pb.OrdersResponse, error) {
+func (u *UserDB) GetUserOrderList(id uint64) (*pb.OrdersResponse, error) {
 	req := &pb.UserRequest{
 		UserId: id,
 	}

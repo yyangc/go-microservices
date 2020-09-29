@@ -11,7 +11,7 @@ type Response struct {
 }
 
 func ResJSON(w http.ResponseWriter, statusCode int, res *Response) error {
-	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	if res.Message == "" {
 		res.Message = http.StatusText(statusCode)

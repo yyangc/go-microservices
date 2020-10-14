@@ -22,7 +22,7 @@ func main() {
 
 	conn, err := grpc.Dial("localhost:9092", grpc.WithInsecure())
 	if err != nil {
-		panic(err)
+		l.Fatal(err)
 	}
 	defer conn.Close()
 	oClient := pb.NewOrderClient(conn)

@@ -5,15 +5,15 @@ service Order {
 }
 
 message UserRequest {
-   int64 user_id = 1;
+   uint64 user_id = 1;
 }
 
 message OrdersResponse {
   message  Order {
-    int64 user_id = 1;
-    int64 order_id = 2;
+    uint64 user_id = 1;
+    uint64 order_id = 2;
     double price = 3;
-    int32  status = 4;
+    uint32  status = 4;
     string  created_dt = 5;
     string  updated_dt = 6;
   }
